@@ -1,12 +1,12 @@
 {
-  "name": "dlSonTra-ProcessManagement",
+  "name": "VietinBank-Insurance-Report-Processing-System",
   "version": "2.1.0",
   "private": true,
   "author": "Nguyen Thanh Duc",
   "license": "",
-  "description": "The work progress management system for Son Tra Power in Da Nang City, Vietnam",
+  "description": "Reporting and planning system for Vietinbank Danang insurance (ReactJS+MUI)",
   "bugs": {
-    "url": "https://dlsontra-processmanagement.firebaseapp.com/quanlyhoso"
+    "url": "https://vbiinsurancereportprocessing.web.app/"
   },
   "repository": {
     "type": "git",
