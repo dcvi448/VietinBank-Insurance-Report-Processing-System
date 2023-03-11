@@ -9,7 +9,7 @@ const firebaseConfig = {
   
 };
 
-const app = initializeApp(vbiConfig);
+const app = initializeApp(firebaseConfig);
 
 export const firebaseApp = app;
 export const firebaseStorage = getStorage(app)

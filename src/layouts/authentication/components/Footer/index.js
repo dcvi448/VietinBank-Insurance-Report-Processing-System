@@ -50,7 +50,7 @@ function Footer({ light }) {
             color={light ? "white" : "text"}
             fontSize={size.sm}
           >
-            &copy; {new Date().getFullYear()}, ĐL Sơn Trà
+            &copy; {new Date().getFullYear()}, VBI
             <MDBox fontSize={size.md} color={light ? "white" : "dark"} mb={-0.5} mx={0.25}>
               <Icon color="inherit" fontSize="inherit">
                 favorite
@@ -59,7 +59,7 @@ function Footer({ light }) {
             - tạo bởi 
             <Link href="https://cpc.vn/vi-vn/" target="_blank">
               <MDTypography variant="button" fontWeight="medium" color={light ? "white" : "dark"}>
-                &nbsp;Thiện Hồ&nbsp;
+                &nbsp;Đức Nguyễn&nbsp;
               </MDTypography>
             </Link>
           </MDBox>
