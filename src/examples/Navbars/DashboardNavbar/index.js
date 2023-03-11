@@ -33,8 +33,8 @@ import {
 import { useSignOut, useAuthUser } from "react-auth-kit";
 
 const pages = [
-  { name: "Quản lý hồ sơ", path: "/quanlyhoso" },
-  { name: "Báo cáo", path: "/baocaohoso" },
+  { name: "Tạo báo cáo", path: "/taobaocao" },
+  //{ name: "Báo cáo", path: "/baocaohoso" },
 ];
 function DashboardNavbar({ absolute, light, isMini }) {
   const [navbarType, setNavbarType] = useState();
@@ -129,18 +129,18 @@ function DashboardNavbar({ absolute, light, isMini }) {
           variant="h6"
           noWrap
           component="a"
-          href="/quanlyhoso"
+          href="/taobaocao"
           sx={{
             mr: 2,
             display: { xs: "none", md: "flex" },
             fontFamily: "monospace",
-            fontWeight: 700,
-            letterSpacing: ".3rem",
+            fontWeight: 500,
+            letterSpacing: ".1rem",
             color: "inherit",
             textDecoration: "none",
           }}
         >
-          Process Management
+          Report Processing System
         </Typography>
 
         <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
@@ -192,13 +192,13 @@ function DashboardNavbar({ absolute, light, isMini }) {
             display: { xs: "flex", md: "none" },
             flexGrow: 1,
             fontFamily: "monospace",
-            fontWeight: 700,
-            letterSpacing: ".3rem",
+            fontWeight: 500,
+            letterSpacing: ".1rem",
             color: "inherit",
             textDecoration: "none",
           }}
         >
-          Process Management
+          Report Processing System
         </Typography>
         <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
           {pages.map((page) => (
@@ -216,7 +216,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
         <Box sx={{ flexGrow: 0 }}>
           <Tooltip title="Tùy chọn">
             <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-              <Avatar alt="Thien Ho" src="/static/images/avatar/2.jpg" />
+              <Avatar src="../../../assets/images/logos/vbi-logo.png" />
             </IconButton>
           </Tooltip>
           <Menu

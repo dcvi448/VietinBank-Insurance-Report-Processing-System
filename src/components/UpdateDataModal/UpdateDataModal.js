@@ -21,7 +21,7 @@ import {
 import {useCollectionData} from 'react-firebase-hooks/firestore';
 import {db} from '../../layouts/authentication/components/firebase.js';
 import UploadFileDialog from 'components/Dialog/UploadFileDialog';
-import {COLUMNS, HIDE_COLUMNS} from 'layouts/hoso/components/columns';
+import {COLUMNS, HIDE_COLUMNS} from 'layouts/reports/components/columns';
 
 const updateData = async (docId, newData) => {
   try {

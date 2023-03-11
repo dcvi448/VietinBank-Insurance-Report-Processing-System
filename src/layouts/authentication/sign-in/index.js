@@ -27,7 +27,7 @@ function Basic() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const params = location.search || '/quanlyhoso';
+  const params = location.search || '/taobaocao';
 
   const HandleSubmit = async (e) => {
     e.preventDefault();

@@ -10,7 +10,7 @@ import CreateDocument from "./components/create.js"
 import MoveDocument from "./components/move.js"
 import ContractDocument from "./components/contract.js";
 
-function HoSo() {
+function Report() {
   return (
     <DashboardLayout>
       <DashboardNavbar isMini />
@@ -44,4 +44,4 @@ export const ChuyenHoSoSangDienLuc = ChuyenHoSo;
 
 export const ThoaThuanDauNoi = ThoaThuan;
 
-export default HoSo;
+export default Report;
