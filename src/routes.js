@@ -1,18 +1,18 @@
-import HoSo from "layouts/hoso";
+import Report from "layouts/reports";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 import Icon from "@mui/material/Icon";
-import HoSoReport from "layouts/hoso/indexReport";
+import HoSoReport from "layouts/reports/indexReport";
 
 const routes = [
   {
     type: "collapse",
-    name: "Quản lý hồ sơ",
-    title: "Quản lý hồ sơ",
-    key: "HoSo",
+    name: "Tạo báo cáo",
+    title: "Tạo báo cao",
+    key: "Report",
     icon: <Icon fontSize="small">post_add</Icon>,
-    route: "/quanlyhoso",
-    component: <HoSo />,
+    route: "/taobaocao",
+    component: <Report />,
     isPrivate: true,
     isCheckRole: false
   },
