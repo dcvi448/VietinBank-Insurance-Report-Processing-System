@@ -11,13 +11,13 @@ export const COLUMNS = [
     },
     {
         Header: 'Xem trước',
-        accessor: 'TepDinhKemLucTaoHoSo',
+        accessor: 'TepDinhKem',
         width: "30%"
     },
     {
 
         Header: 'Hành động',
-        accessor: 'BuocTiep',
+        accessor: 'HanhDong',
         width: "15%"
     },
 ];
