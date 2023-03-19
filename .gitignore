@@ -352,4 +352,4 @@ build/
 
 .github/
 
-#src/utils/firebase.js
+src/utils/firebase.js
