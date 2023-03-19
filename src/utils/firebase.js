@@ -6,7 +6,13 @@ import { getStorage } from "firebase/storage";
 
 
 const firebaseConfig = {
-  
+  apiKey: "AIzaSyBiWYarh2-vR0JMfSka-HzoncxKNUD-PYI",
+  authDomain: "vbiinsurancereportprocessing.firebaseapp.com",
+  projectId: "vbiinsurancereportprocessing",
+  storageBucket: "vbiinsurancereportprocessing.appspot.com",
+  messagingSenderId: "896976300944",
+  appId: "1:896976300944:web:97f40f6580094e510ee115",
+  measurementId: "G-45H31Y6R6R"
 };
 
 const app = initializeApp(firebaseConfig);

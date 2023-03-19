@@ -7,8 +7,6 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import CreateDocument from "./components/create.js"
-import MoveDocument from "./components/move.js"
-import ContractDocument from "./components/contract.js";
 
 function Report() {
   return (
@@ -19,29 +17,5 @@ function Report() {
     </DashboardLayout>
   );
 }
-
-function ChuyenHoSo() {
-  return (
-    <DashboardLayout>
-      <DashboardNavbar />
-      <MoveDocument/>
-      <Footer />
-    </DashboardLayout>
-  );
-}
-
-function ThoaThuan() {
-  return (
-    <DashboardLayout>
-      <DashboardNavbar />
-      <ContractDocument/>
-      <Footer />
-    </DashboardLayout>
-  );
-}
-
-export const ChuyenHoSoSangDienLuc = ChuyenHoSo;
-
-export const ThoaThuanDauNoi = ThoaThuan;
 
 export default Report;

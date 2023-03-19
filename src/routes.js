@@ -2,7 +2,6 @@ import Report from "layouts/reports";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 import Icon from "@mui/material/Icon";
-import HoSoReport from "layouts/reports/indexReport";
 
 const routes = [
   {
@@ -13,16 +12,6 @@ const routes = [
     icon: <Icon fontSize="small">post_add</Icon>,
     route: "/taobaocao",
     component: <Report />,
-    isPrivate: true,
-    isCheckRole: false
-  },
-  {
-    type: "collapse",
-    name: "Báo cáo hồ sơ",
-    key: "HoSoReport",
-    icon: <Icon fontSize="small">content_paste_go</Icon>,
-    route: "/baocaohoso",
-    component: <HoSoReport />,
     isPrivate: true,
     isCheckRole: false
   },
