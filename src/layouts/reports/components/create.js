@@ -4,7 +4,6 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { db, addData } from "../../authentication/components/firebase.js";
 import DataTable from "examples/Tables/DataTable";
-import UploadFileDialog from "components/Dialog/UploadFileDialog.js";
 import MDBox from "components/MDBox";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
@@ -29,7 +28,22 @@ async function getDocuments() {
 
 function CreateDocument() {
   const [data, setData] = useState([]);
+  const [summaryReportExcelFile, setSummaryReportExcelFile] = useState(null);
+  const [borrowerReportExcelFile, setBorrowerReportExcelFile] = useState(null);
+  const [summaryReportExcelFileName, setSummaryReportExcelFileName] = useState('');
+  const [borrowerReportExcelFileName, setBorrowerReportExcelFileName] = useState('');
+  
   const user = useAuthUser()();
+
+  const handleSummaryReportExcelFileChange = (event) => {
+    setSummaryReportExcelFileName(event.target.files[0].name);
+    setSummaryReportExcelFile(event.target.files[0]);
+  }
+
+  const handleBorrowerReportExcelFileChange = (event) => {
+    setBorrowerReportExcelFileName(event.target.files[0].name);
+    setBorrowerReportExcelFile(event.target.files[0]);
+  }
 
   async function fetchData() {
     const docData = await getDocuments();
@@ -120,20 +134,60 @@ function CreateDocument() {
                 boxSizing: "border-box",
               }}
             >
-              <MDBox mb={2} style={{ gridColumn: "1 / span 1" }}>
-                <UploadFileDialog
-                  label="Tệp báo cáo tổng hợp"
-                  order={0}
-                  fileCount={2}
-                />
-              </MDBox>
-              <MDBox mb={2} style={{ gridColumn: "2 / span 1" }}>
-                <UploadFileDialog
-                  label="Tệp báo cáo người vay vốn"
-                  order={1}
-                  fileCount={2}
-                />
-              </MDBox>
+<MDBox mb={2} style={{ gridColumn: "1 / span 1" }}>
+<MDBox display="grid" gridTemplateColumns="1fr 1fr" gridgap="5px">
+      <MDInput
+        type="text"
+        label="Tệp báo cáo tổng hợp"
+        fullWidth
+        variant="outlined"
+        InputLabelProps={{ shrink: true }}
+        InputProps={{ readOnly: true }}
+        value={summaryReportExcelFileName}
+      />
+      <input
+        id='summaryReportExcelFile'
+        type="file"
+        onChange={handleSummaryReportExcelFileChange}
+        style={{ position: "absolute", width: "0", height: "0", opacity: "0", overflow: "hidden" }}
+      />
+      <MDBox style={{ display: "flex", alignItems: "center", marginLeft: "5px" }}>
+        <label htmlFor='summaryReportExcelFile' style={{ fontSize: "0.9rem" }}>
+          Chọn tệp...
+        </label>
+      </MDBox>
+    </MDBox>
+
+    </MDBox>
+
+    <MDBox mb={2} style={{ gridColumn: "2 / span 1" }}>
+<MDBox display="grid" gridTemplateColumns="1fr 1fr" gridgap="5px">
+      <MDInput
+        type="text"
+        label="Tệp báo cáo người vay vốn"
+        fullWidth
+        variant="outlined"
+        InputLabelProps={{ shrink: true }}
+        InputProps={{ readOnly: true }}
+        value={borrowerReportExcelFileName}
+      />
+      <input
+        id='borrowerReportExcelFile'
+        type="file"
+        onChange={handleBorrowerReportExcelFileChange}
+        style={{ position: "absolute", width: "0", height: "0", opacity: "0", overflow: "hidden" }}
+      />
+      <MDBox style={{ display: "flex", alignItems: "center", marginLeft: "5px" }}>
+        <label htmlFor='borrowerReportExcelFile' style={{ fontSize: "0.9rem" }}>
+          Chọn tệp...
+        </label>
+      </MDBox>
+    </MDBox>
+
+    </MDBox>
+
+
+              
 
               <MDBox mb={2} style={{ gridColumn: "3 / span 1" }}>
                 <MDButton
