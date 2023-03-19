@@ -4,27 +4,17 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { db, addData } from "../../authentication/components/firebase.js";
 import DataTable from "examples/Tables/DataTable";
-
-import FullRecordsDateStep from "components/DateTimePickerModal/FullRecordsDateStep.js";
-import TransferDocumentsToCompany from "components/DateTimePickerModal/TransferDocumentsToCompany.js";
-import ElectricalConnectionAgreementStep from "components/DateTimePickerModal/ElectricalConnectionAgreementStep.js";
-import ConfirmReceiptOfConnectionAgreementStep from "components/DateTimePickerModal/ConfirmReceiptOfConnectionAgreementStep.js";
-import UploadFileDialog from "components/Dialog/UploadFileDialog.js";
 import MDBox from "components/MDBox";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import { COLUMNS } from "./columns.js";
-import ProposalForAcceptanceStep from "components/DateTimePickerModal/ProposalForAcceptanceStep.js";
-import CompleteTheAcceptanceTestStep from "components/DateTimePickerModal/CompleteTheAcceptanceTestStep.js";
 import {
   getCurrentDate,
   convertDateTimeStringToVnTime,
-  getDocumentsWithCondition,
-} from "../../../components/utils.js";
+} from "../../../utils/systemUtils.js";
 import { useAuthUser, useSignIn } from "react-auth-kit";
 import { rolePermissionRule } from "../../authentication/sign-in/rolePermissionRule.js";
-import GetNextStep from "./GetNextStep.js";
-import UpdateDataStep from "./UpdateDataStep.js";
+import { read, utils, writeFile } from 'xlsx';
 
 async function getDocuments() {
   const q = query(collection(db, "Documents"));
@@ -38,7 +28,22 @@ async function getDocuments() {
 
 function CreateDocument() {
   const [data, setData] = useState([]);
+  const [summaryReportExcelFile, setSummaryReportExcelFile] = useState(null);
+  const [borrowerReportExcelFile, setBorrowerReportExcelFile] = useState(null);
+  const [summaryReportExcelFileName, setSummaryReportExcelFileName] = useState('');
+  const [borrowerReportExcelFileName, setBorrowerReportExcelFileName] = useState('');
+  
   const user = useAuthUser()();
+
+  const handleSummaryReportExcelFileChange = (event) => {
+    setSummaryReportExcelFileName(event.target.files[0].name);
+    setSummaryReportExcelFile(event.target.files[0]);
+  }
+
+  const handleBorrowerReportExcelFileChange = (event) => {
+    setBorrowerReportExcelFileName(event.target.files[0].name);
+    setBorrowerReportExcelFile(event.target.files[0]);
+  }
 
   async function fetchData() {
     const docData = await getDocuments();
@@ -47,126 +52,32 @@ function CreateDocument() {
         return {
           ...current,
 
-          TepDinhKemLucTaoHoSo: current.TepDinhKemLucTaoHoSo ? (
+          TepDinhKem: current.TepDinhKem ? (
             <div>
-              <a href={current.TepDinhKemLucTaoHoSo} target="_blank">
-                Xem tệp lúc tạo hồ sơ
+              <a href={current.TepDinhKem} target="_blank">
+                Xem tệp
               </a>
-              {current.TepDinhKemChuyenVePKT ? (
-                <div>
-                  <a href={current.TepDinhKemChuyenVePKT} target="_blank">
-                    Xem tệp bước về PKT
-                  </a>
-                </div>
-              ) : (
-                ""
-              )}
-              {current.TepDinhKemHoSoThoaThuan ? (
-                <div>
-                  <a href={current.TepDinhKemHoSoThoaThuan} target="_blank">
-                    Xem tệp bước thỏa thuận
-                  </a>
-                </div>
-              ) : (
-                ""
-              )}
-              {current.TepDinhKemNgayNhanThoaThuan ? (
-                <div>
-                  <a href={current.TepDinhKemNgayNhanThoaThuan} target="_blank">
-                    Xem tệp bước nhận thỏa thuận
-                  </a>
-                </div>
-              ) : (
-                ""
-              )}
-              {current.TepDinhKemNgayDeNghiNghiemThu ? (
-                <div>
-                  <a
-                    href={current.TepDinhKemNgayDeNghiNghiemThu}
-                    target="_blank"
-                  >
-                    Xem tệp bước đề nghị nghiệm thu
-                  </a>
-                </div>
-              ) : (
-                ""
-              )}
-              {current.TepDinhKemNgayHoanThanhNghiemThu ? (
-                <div>
-                  <a
-                    href={current.TepDinhKemNgayHoanThanhNghiemThu}
-                    target="_blank"
-                  >
-                    Xem tệp bước hoàn thành nghiệm thu
-                  </a>
-                </div>
-              ) : (
-                ""
-              )}
             </div>
           ) : (
             ""
           ),
-          NgayDeNghiDauNoi:
-            current.NgayDeNghiDauNoi === undefined ||
-            current.NgayDeNghiDauNoi === null
-              ? ""
-              : current.NgayDeNghiDauNoi,
-          NgayChuyenHoSoThoaThuan:
-            current.NgayChuyenHoSoThoaThuan === undefined ||
-            current.NgayChuyenHoSoThoaThuan === null
-              ? ""
-              : current.NgayChuyenHoSoThoaThuan,
-          NgayChuyenVePKT:
-            current.NgayChuyenVePKT === undefined ||
-            current.NgayChuyenVePKT === null
-              ? ""
-              : current.NgayChuyenVePKT,
-          NgayNopHoSoDayDu:
-            current.NgayNopHoSoDayDu === undefined ||
-            current.NgayNopHoSoDayDu === null
-              ? ""
-              : current.NgayNopHoSoDayDu,
-          BuocTiep: (
+          HanhDong: (
             <MDBox>
-              {rolePermissionRule(user.role, "UpdateDataStep") && (
-                <UpdateDataStep
-                  role={user.role}
-                  refreshData={fetchData}
-                  documentId={current.MaHoSo}
-                  documentData={current}
-                  key="UpdateDataStep"
-                ></UpdateDataStep>
+              {rolePermissionRule(user.role, "DownloadData") && (
+                <MDButton
+                  color="success"
+                  onClick={() => {
+                    const link = document.createElement("a");
+                    link.href = current.TepDinhKem;
+                    link.download = current.TepDinhKem;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                  }}
+                >
+                  Tải về
+                </MDButton>
               )}
-              <GetNextStep
-                role={user.role}
-                refreshData={fetchData}
-                documentId={current.MaHoSo}
-                documentData={current}
-                currentStep={
-                  current.NgayNopHoSoDayDu == null
-                    ? "Xác nhận đủ HS"
-                    : current.NgayNopHoSoDayDu != null &&
-                      (current.NgayChuyenVePKT === null ||
-                        current.NgayChuyenVePKT === undefined)
-                    ? "Chuyển về công ty"
-                    : current.NgayNopHoSoDayDu != null &&
-                      current.NgayChuyenVePKT != null &&
-                      (current.NgayChuyenHoSoThoaThuan === undefined ||
-                        current.NgayChuyenHoSoThoaThuan === null)
-                    ? "Thoả thuận Đấu nối"
-                    : current.NgayNhanHoSoThoaThuan === null ||
-                      current.NgayNhanHoSoThoaThuan === undefined
-                    ? "Nhận thỏa thuận đấu nối"
-                    : current.NgayDeNghiNghiemThu === null ||
-                      current.NgayDeNghiNghiemThu === undefined
-                    ? "Đề nghị nghiệm thu"
-                    : current.NgayHoanThanhNghiemThu === null ||
-                      current.NgayHoanThanhNghiemThu === undefined
-                    ? "Hoàn thành nghiệm thu"
-                    : "Hoàn tất"
-                }
-              ></GetNextStep>
             </MDBox>
           ),
         };
@@ -223,15 +134,68 @@ function CreateDocument() {
                 boxSizing: "border-box",
               }}
             >
-              <MDBox mb={2} style={{ gridColumn: "1 / span 1" }} fullWidth>
-                <UploadFileDialog />
-              </MDBox>
-              <MDBox mb={2} style={{ gridColumn: "2 / span 1" }} fullWidth>
-                <UploadFileDialog />
-              </MDBox>
+<MDBox mb={2} style={{ gridColumn: "1 / span 1" }}>
+<MDBox display="grid" gridTemplateColumns="1fr 1fr" gridgap="5px">
+      <MDInput
+        type="text"
+        label="Tệp báo cáo tổng hợp"
+        fullWidth
+        variant="outlined"
+        InputLabelProps={{ shrink: true }}
+        InputProps={{ readOnly: true }}
+        value={summaryReportExcelFileName}
+      />
+      <input
+        id='summaryReportExcelFile'
+        type="file"
+        onChange={handleSummaryReportExcelFileChange}
+        style={{ position: "absolute", width: "0", height: "0", opacity: "0", overflow: "hidden" }}
+      />
+      <MDBox style={{ display: "flex", alignItems: "center", marginLeft: "5px" }}>
+        <label htmlFor='summaryReportExcelFile' style={{ fontSize: "0.9rem" }}>
+          Chọn tệp...
+        </label>
+      </MDBox>
+    </MDBox>
 
-              <MDBox mb={2} style={{ gridColumn: "3 / span 1" }} fullWidth>
-                <MDButton variant="gradient" color="info" type="submit" fullWidth>
+    </MDBox>
+
+    <MDBox mb={2} style={{ gridColumn: "2 / span 1" }}>
+<MDBox display="grid" gridTemplateColumns="1fr 1fr" gridgap="5px">
+      <MDInput
+        type="text"
+        label="Tệp báo cáo người vay vốn"
+        fullWidth
+        variant="outlined"
+        InputLabelProps={{ shrink: true }}
+        InputProps={{ readOnly: true }}
+        value={borrowerReportExcelFileName}
+      />
+      <input
+        id='borrowerReportExcelFile'
+        type="file"
+        onChange={handleBorrowerReportExcelFileChange}
+        style={{ position: "absolute", width: "0", height: "0", opacity: "0", overflow: "hidden" }}
+      />
+      <MDBox style={{ display: "flex", alignItems: "center", marginLeft: "5px" }}>
+        <label htmlFor='borrowerReportExcelFile' style={{ fontSize: "0.9rem" }}>
+          Chọn tệp...
+        </label>
+      </MDBox>
+    </MDBox>
+
+    </MDBox>
+
+
+              
+
+              <MDBox mb={2} style={{ gridColumn: "3 / span 1" }}>
+                <MDButton
+                  variant="gradient"
+                  color="info"
+                  type="submit"
+                  fullWidth
+                >
                   Tạo báo cáo nội bộ
                 </MDButton>
               </MDBox>
@@ -239,7 +203,7 @@ function CreateDocument() {
           </MDBox>
         </MDBox>
       )}
-      <MDBox mb={3} fullWidth  >
+      <MDBox mb={3}>
         <DataTable
           canSearch={true}
           table={{

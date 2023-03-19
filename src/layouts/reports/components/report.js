@@ -12,7 +12,7 @@ import "ag-grid-community/styles/ag-grid.css"; // Core grid CSS, always needed
 import "ag-grid-community/styles/ag-theme-material.css";
 import { COLUMNS } from "./columnsReport.js";
 import { db, addData } from "../../authentication/components/firebase.js";
-import { convertTimestampToDate, convertDateTimeToString } from "../../../components/utils.js";
+import { convertTimestampToDate, convertDateTimeToString } from "../../../utils/systemUtils.js";
 import { collection, getDocs, query } from "firebase/firestore";
 import MDBox from "components/MDBox";
 import "../../../assets/theme/styles.css"

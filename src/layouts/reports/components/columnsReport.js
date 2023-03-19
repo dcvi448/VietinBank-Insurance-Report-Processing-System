@@ -5,7 +5,7 @@ import {
   convertTimestampToDate,
   convertDateTimeToString,
   convertVnTimeStringToDate,
-} from '../../../components/utils.js';
+} from '../../../utils/systemUtils.js';
 import '../../../assets/theme/styles.css';
 
 export const COLUMNS = [
