@@ -11,7 +11,7 @@ import { Link } from 'react-router-dom';
 import "ag-grid-community/styles/ag-grid.css"; // Core grid CSS, always needed
 import "ag-grid-community/styles/ag-theme-material.css";
 import { COLUMNS } from "./columnsReport.js";
-import { db, addData } from "../../authentication/components/firebase.js";
+import { db, addData } from "../../../utils/firebase.js";
 import { convertTimestampToDate, convertDateTimeToString } from "../../../utils/systemUtils.js";
 import { collection, getDocs, query } from "firebase/firestore";
 import MDBox from "components/MDBox";

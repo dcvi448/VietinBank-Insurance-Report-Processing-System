@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { collection, getDocs, query } from "firebase/firestore";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { db, addData } from "../../authentication/components/firebase.js";
+import { db, addData } from "../../../utils/firebase.js";
 import DataTable from "examples/Tables/DataTable";
 import MDBox from "components/MDBox";
 import MDInput from "components/MDInput";

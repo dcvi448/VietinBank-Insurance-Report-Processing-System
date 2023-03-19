@@ -5,7 +5,7 @@ import { collection, doc, setDoc , getDocs, query, where} from "firebase/firesto
 import { useCollectionData } from 'react-firebase-hooks/firestore';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import {db} from '../../authentication/components/firebase.js';
+import {db} from '../../../utils/firebase.js';
 
 // react-router-dom components
 import { Link } from "react-router-dom";

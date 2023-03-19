@@ -11,7 +11,7 @@ import MDInput from 'components/MDInput';
 import MDButton from 'components/MDButton';
 
 import { collection, getDocs, query } from "firebase/firestore";
-import { db, addData } from "../../authentication/components/firebase.js";
+import { db, addData } from "../../../utils/firebase.js";
 // Authentication layout components
 import CoverLayout from 'layouts/authentication/components/CoverLayout';
 import { ToastContainer, toast } from "react-toastify";
