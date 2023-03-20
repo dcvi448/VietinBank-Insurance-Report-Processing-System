@@ -12,8 +12,14 @@ const getWorksheet = async (
   sheetIndex = 0,
   clearSheetExcelGlobal = true
 ) => {
-  const response = await fetch(excelUrl);
-  const data = await response.arrayBuffer();
+  const reader = new FileReader();
+  reader.readAsArrayBuffer(excelUrl);
+  await new Promise((resolve) => {
+    reader.onload = () => {
+      resolve();
+    };
+  });
+  const data = reader.result;
   const workbook = XLSX.read(data, { type: "array" });
   const sheetName = workbook.SheetNames[sheetIndex];
   sheetExcel = clearSheetExcelGlobal ? workbook.Sheets[sheetName] : sheetExcel;
@@ -22,14 +28,14 @@ const getWorksheet = async (
 
 export const getNonDuplicateValues = async (
   excelUrl,
-  columnId = "A",
+  columnId = "STT",
   sheetIndex = 0,
   clearSheetExcelGlobal = false
 ) => {
-  const worksheet =
-    sheetExcel &&
-    (await getWorksheet(excelUrl, sheetIndex, clearSheetExcelGlobal));
+  const worksheet = sheetExcel === null ?
+    (await getWorksheet(excelUrl, sheetIndex, clearSheetExcelGlobal)): sheetExcel;
   const parsedData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+ 
   const adColumnIndex = parsedData[0].indexOf(columnId);
   const adColumnValues = parsedData.slice(1).map((row) => row[adColumnIndex]);
   const nonDuplicateAdColumnValues = [...new Set(adColumnValues)];
@@ -44,9 +50,8 @@ export const filterAndSum = async (
   sheetIndex = 0,
   clearSheetExcelGlobal = false
 ) => {
-  const worksheet =
-    sheetExcel &&
-    (await getWorksheet(excelUrl, sheetIndex, clearSheetExcelGlobal));
+  const worksheet = sheetExcel === null ?
+    (await getWorksheet(excelUrl, sheetIndex, clearSheetExcelGlobal)): sheetExcel;
   const conditions = columnsMustFilter.map((col, index) => ({
     column: XLSX.utils.decode_col(col),
     value: valuesColumnsMustFilter[index],
@@ -87,9 +92,8 @@ export const insertSumToCell = async (
     clearSheetExcelGlobal
   );
 
-  const worksheet =
-    sheetExcel &&
-    (await getWorksheet(excelUrl, sheetIndexToInsert, clearSheetExcelGlobal));
+  const worksheet = sheetExcel === null ?
+    (await getWorksheet(excelUrl, sheetIndex, clearSheetExcelGlobal)): sheetExcel;
 
   const cell = worksheet[cellToInsert];
   cell.v = sum;
@@ -112,9 +116,8 @@ export const applyExcelFunctionToColumnAndInsertResult = async (
   cellToInsert,
   clearSheetExcelGlobal = false
 ) => {
-  const worksheet =
-    sheetExcel &&
-    (await getWorksheet(excelUrl, sheetIndex, clearSheetExcelGlobal));
+  const worksheet = sheetExcel === null ?
+    (await getWorksheet(excelUrl, sheetIndex, clearSheetExcelGlobal)): sheetExcel;
 
   const range = XLSX.utils.decode_range(worksheet["!ref"]);
 

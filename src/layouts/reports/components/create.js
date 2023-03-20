@@ -14,39 +14,88 @@ import {
 } from "../../../utils/systemUtils.js";
 import { useAuthUser, useSignIn } from "react-auth-kit";
 import { rolePermissionRule } from "../../authentication/sign-in/rolePermissionRule.js";
-import { read, utils, writeFile } from 'xlsx';
-
-async function getDocuments() {
-  const q = query(collection(db, "Documents"));
-  const querySnapshot = await getDocs(q);
-  const docData = [];
-  querySnapshot.forEach((doc) => {
-    docData.push(doc.data());
-  });
-  return docData;
-}
+import { read, utils, writeFile } from "xlsx";
+import {
+  getNonDuplicateValues,
+  filterAndSum,
+} from "../../../utils/excelUtils.js";
+import { element } from "prop-types";
 
 function CreateDocument() {
   const [data, setData] = useState([]);
   const [summaryReportExcelFile, setSummaryReportExcelFile] = useState(null);
   const [borrowerReportExcelFile, setBorrowerReportExcelFile] = useState(null);
-  const [summaryReportExcelFileName, setSummaryReportExcelFileName] = useState('');
-  const [borrowerReportExcelFileName, setBorrowerReportExcelFileName] = useState('');
-  
+  const [summaryReportExcelFileName, setSummaryReportExcelFileName] =
+    useState("");
+  const [borrowerReportExcelFileName, setBorrowerReportExcelFileName] =
+    useState("");
+  const [listUnit, setListUnit] = useState([]);
   const user = useAuthUser()();
 
   const handleSummaryReportExcelFileChange = (event) => {
     setSummaryReportExcelFileName(event.target.files[0].name);
     setSummaryReportExcelFile(event.target.files[0]);
-  }
+  };
 
   const handleBorrowerReportExcelFileChange = (event) => {
     setBorrowerReportExcelFileName(event.target.files[0].name);
     setBorrowerReportExcelFile(event.target.files[0]);
-  }
+  };
 
   async function fetchData() {
-    const docData = await getDocuments();
+    const docData = listUnit.map((current) => {
+      return {
+        DonVi: current,
+      };
+    });
+    for (let unitIndex = 0; unitIndex < docData.length; unitIndex++) {
+      docData[unitIndex] = {
+        ...docData[unitIndex],
+        Department: await (
+          await getNonDuplicateValues(
+            summaryReportExcelFile,
+            "Tên phòng ban/PGD",
+            0,
+            true
+          )
+        ).map((element) => {
+          return { Name: element, KHCN: 0, KHDN: 0 };
+        }),
+      };
+    }
+
+    console.log(docData);
+    for (let unitIndex = 0; unitIndex < docData.length; unitIndex++) {
+      for (
+        let departmentIndex = 0;
+        departmentIndex < docData[unitIndex].Department.length;
+        departmentIndex++
+      ) {
+        docData[unitIndex].Department[departmentIndex]["KHCN"] =
+          await filterAndSum(
+            summaryReportExcelFile,
+            [27, 29, 4],
+            [
+              docData[unitIndex].DonVi,
+              docData[unitIndex].Department[departmentIndex].Name,
+              "Cá nhân",
+            ],
+            "U"
+          );
+        docData[unitIndex].Department[departmentIndex]["KHDN"] =
+          await filterAndSum(
+            summaryReportExcelFile,
+            [27, 29, 4],
+            [
+              docData[unitIndex].DonVi,
+              docData[unitIndex].Department[departmentIndex].Name,
+              "Doanh nghiệp",
+            ],
+            "U"
+          );
+      }
+    }
+    console.log(docData);
     await setData(
       docData.map((current) => {
         return {
@@ -92,17 +141,16 @@ function CreateDocument() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const result = await addData("Documents", e.target[0].value, {
-      MaHoSo: e.target[0].value,
-      NgayDeNghiDauNoi: convertDateTimeStringToVnTime(e.target[2].value),
-      TenKhachHang: e.target[4].value,
-      CongSuatDeNghi: e.target[6].value,
-      NgayNopHoSoDayDu: convertDateTimeStringToVnTime(e.target[8].value),
-      TepDinhKemLucTaoHoSo: e.target[10].value,
-      TaoBoi: user ? user.user : "",
-      NgayTao: getCurrentDate(),
-      DonVi: user.branch,
-    });
+    setListUnit(
+      await getNonDuplicateValues(
+        summaryReportExcelFile,
+        "Tên đơn vị quản lý",
+        0,
+        true
+      )
+    );
+
+    let result = "thành công";
     if (result.includes("thành công")) {
       fetchData();
       toast.success(result, {
@@ -134,60 +182,93 @@ function CreateDocument() {
                 boxSizing: "border-box",
               }}
             >
-<MDBox mb={2} style={{ gridColumn: "1 / span 1" }}>
-<MDBox display="grid" gridTemplateColumns="1fr 1fr" gridgap="5px">
-      <MDInput
-        type="text"
-        label="Tệp báo cáo tổng hợp"
-        fullWidth
-        variant="outlined"
-        InputLabelProps={{ shrink: true }}
-        InputProps={{ readOnly: true }}
-        value={summaryReportExcelFileName}
-      />
-      <input
-        id='summaryReportExcelFile'
-        type="file"
-        onChange={handleSummaryReportExcelFileChange}
-        style={{ position: "absolute", width: "0", height: "0", opacity: "0", overflow: "hidden" }}
-      />
-      <MDBox style={{ display: "flex", alignItems: "center", marginLeft: "5px" }}>
-        <label htmlFor='summaryReportExcelFile' style={{ fontSize: "0.9rem" }}>
-          Chọn tệp...
-        </label>
-      </MDBox>
-    </MDBox>
+              <MDBox mb={2} style={{ gridColumn: "1 / span 1" }}>
+                <MDBox
+                  display="grid"
+                  gridTemplateColumns="1fr 1fr"
+                  gridgap="5px"
+                >
+                  <MDInput
+                    type="text"
+                    label="Tệp báo cáo tổng hợp"
+                    fullWidth
+                    variant="outlined"
+                    InputLabelProps={{ shrink: true }}
+                    InputProps={{ readOnly: true }}
+                    value={summaryReportExcelFileName}
+                  />
+                  <input
+                    id="summaryReportExcelFile"
+                    type="file"
+                    onChange={handleSummaryReportExcelFileChange}
+                    style={{
+                      position: "absolute",
+                      width: "0",
+                      height: "0",
+                      opacity: "0",
+                      overflow: "hidden",
+                    }}
+                  />
+                  <MDBox
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      marginLeft: "5px",
+                    }}
+                  >
+                    <label
+                      htmlFor="summaryReportExcelFile"
+                      style={{ fontSize: "0.9rem" }}
+                    >
+                      Chọn tệp...
+                    </label>
+                  </MDBox>
+                </MDBox>
+              </MDBox>
 
-    </MDBox>
-
-    <MDBox mb={2} style={{ gridColumn: "2 / span 1" }}>
-<MDBox display="grid" gridTemplateColumns="1fr 1fr" gridgap="5px">
-      <MDInput
-        type="text"
-        label="Tệp báo cáo người vay vốn"
-        fullWidth
-        variant="outlined"
-        InputLabelProps={{ shrink: true }}
-        InputProps={{ readOnly: true }}
-        value={borrowerReportExcelFileName}
-      />
-      <input
-        id='borrowerReportExcelFile'
-        type="file"
-        onChange={handleBorrowerReportExcelFileChange}
-        style={{ position: "absolute", width: "0", height: "0", opacity: "0", overflow: "hidden" }}
-      />
-      <MDBox style={{ display: "flex", alignItems: "center", marginLeft: "5px" }}>
-        <label htmlFor='borrowerReportExcelFile' style={{ fontSize: "0.9rem" }}>
-          Chọn tệp...
-        </label>
-      </MDBox>
-    </MDBox>
-
-    </MDBox>
-
-
-              
+              <MDBox mb={2} style={{ gridColumn: "2 / span 1" }}>
+                <MDBox
+                  display="grid"
+                  gridTemplateColumns="1fr 1fr"
+                  gridgap="5px"
+                >
+                  <MDInput
+                    type="text"
+                    label="Tệp báo cáo người vay vốn"
+                    fullWidth
+                    variant="outlined"
+                    InputLabelProps={{ shrink: true }}
+                    InputProps={{ readOnly: true }}
+                    value={borrowerReportExcelFileName}
+                  />
+                  <input
+                    id="borrowerReportExcelFile"
+                    type="file"
+                    onChange={handleBorrowerReportExcelFileChange}
+                    style={{
+                      position: "absolute",
+                      width: "0",
+                      height: "0",
+                      opacity: "0",
+                      overflow: "hidden",
+                    }}
+                  />
+                  <MDBox
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      marginLeft: "5px",
+                    }}
+                  >
+                    <label
+                      htmlFor="borrowerReportExcelFile"
+                      style={{ fontSize: "0.9rem" }}
+                    >
+                      Chọn tệp...
+                    </label>
+                  </MDBox>
+                </MDBox>
+              </MDBox>
 
               <MDBox mb={2} style={{ gridColumn: "3 / span 1" }}>
                 <MDButton
