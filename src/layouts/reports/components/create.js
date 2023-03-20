@@ -74,7 +74,7 @@ function CreateDocument() {
         docData[unitIndex].Department[departmentIndex]["KHCN"] =
           await filterAndSum(
             summaryReportExcelFile,
-            [27, 29, 4],
+            ["AB", "AD", "E"],
             [
               docData[unitIndex].DonVi,
               docData[unitIndex].Department[departmentIndex].Name,
@@ -85,7 +85,7 @@ function CreateDocument() {
         docData[unitIndex].Department[departmentIndex]["KHDN"] =
           await filterAndSum(
             summaryReportExcelFile,
-            [27, 29, 4],
+            ["AB", "AD", "E"],
             [
               docData[unitIndex].DonVi,
               docData[unitIndex].Department[departmentIndex].Name,
