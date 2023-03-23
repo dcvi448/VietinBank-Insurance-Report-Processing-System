@@ -18,8 +18,11 @@ import { read, utils, writeFile } from "xlsx";
 import {
   getNonDuplicateValues,
   filterAndSum,
+  filterRow,
+  addDataToExcelFile
 } from "../../../utils/excelUtils.js";
 import { element } from "prop-types";
+import ReactFileReader from "react-file-reader"
 
 function CreateDocument() {
   const [data, setData] = useState([]);
@@ -48,23 +51,21 @@ function CreateDocument() {
         DonVi: current,
       };
     });
+
     for (let unitIndex = 0; unitIndex < docData.length; unitIndex++) {
       docData[unitIndex] = {
         ...docData[unitIndex],
         Department: await (
-          await getNonDuplicateValues(
-            summaryReportExcelFile,
-            "Tên phòng ban/PGD",
-            0,
-            true
-          )
+          await filterRow(summaryReportExcelFile,["AB"],[docData[unitIndex].DonVi],"AD")
         ).map((element) => {
           return { Name: element, KHCN: 0, KHDN: 0 };
         }),
       };
     }
 
-    console.log(docData);
+    console.log("Unit - Department");
+    console.log(docData)
+
     for (let unitIndex = 0; unitIndex < docData.length; unitIndex++) {
       for (
         let departmentIndex = 0;
@@ -95,46 +96,53 @@ function CreateDocument() {
           );
       }
     }
-    console.log(docData);
+
+    console.log("Unit - Department - Bugget");
+    console.log(docData)
+
+
+    function getDepartmentInfoByDonVi(donVi) {
+      const filteredData = docData.filter(data => data.DonVi === donVi);
+      const departmentInfo = filteredData.map(data => data.Department.map(department => [
+        department.Name,
+        department.KHCN,
+        department.KHDN
+      ]));
+      console.log("Department follow by Don Vi")
+      console.log(departmentInfo)
+      return departmentInfo;
+    }
+    for(let index = 0; index<docData.length; index++){
+      let data = getDepartmentInfoByDonVi(docData[index].DonVi).flat();
+      data.unshift(["Phòng","KHCN","KHDN"]);
+      data.unshift(["Đơn vị",docData[index].DonVi,""]);
+      let url = await addDataToExcelFile(data,
+        "accumulated",
+        3,
+        `${docData[index].DonVi}.xlsx`
+      );
+      docData[index] = {...docData[index],TepBaoCao: (
+        <div>
+          <a
+            href={url}
+            target="_blank"
+            download={`${docData[index].DonVi}.xlsx`}
+          >
+            {docData[index].DonVi} 
+          </a>
+        </div>
+      ),}
+    }
     await setData(
       docData.map((current) => {
         return {
           ...current,
-
-          TepDinhKem: current.TepDinhKem ? (
-            <div>
-              <a href={current.TepDinhKem} target="_blank">
-                Xem tệp
-              </a>
-            </div>
-          ) : (
-            ""
-          ),
-          HanhDong: (
-            <MDBox>
-              {rolePermissionRule(user.role, "DownloadData") && (
-                <MDButton
-                  color="success"
-                  onClick={() => {
-                    const link = document.createElement("a");
-                    link.href = current.TepDinhKem;
-                    link.download = current.TepDinhKem;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                  }}
-                >
-                  Tải về
-                </MDButton>
-              )}
-            </MDBox>
-          ),
         };
       })
     );
   }
   useEffect(() => {
-    fetchData();
+    //fetchData();
   }, []);
   const columns = useMemo(() => COLUMNS, []);
 
@@ -152,7 +160,7 @@ function CreateDocument() {
 
     let result = "thành công";
     if (result.includes("thành công")) {
-      fetchData();
+      await fetchData();
       toast.success(result, {
         autoClose: 3000,
         closeOnClick: true,
