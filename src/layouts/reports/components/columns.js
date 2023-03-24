@@ -5,20 +5,25 @@ export const COLUMNS = [
         width: "5%"
     },
     {
+        Header: 'Đơn vị',
+        accessor: 'DonVi',
+        width: "30%"
+    },
+    {
         Header: 'Tệp báo cáo',
         accessor: 'TepBaoCao',
-        width: "50%"
+        width: "45%"
     },
     {
         Header: 'Xem trước',
         accessor: 'TepDinhKem',
-        width: "30%"
+        width: "10%"
     },
     {
 
         Header: 'Hành động',
         accessor: 'HanhDong',
-        width: "15%"
+        width: "10%"
     },
 ];
 export const HIDE_COLUMNS = ["Tep", "Ma", "TaoBoi", "NgayTao"]
