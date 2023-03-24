@@ -12,18 +12,7 @@ export const COLUMNS = [
     {
         Header: 'Tệp báo cáo',
         accessor: 'TepBaoCao',
-        width: "45%"
-    },
-    {
-        Header: 'Xem trước',
-        accessor: 'TepDinhKem',
-        width: "10%"
-    },
-    {
-
-        Header: 'Hành động',
-        accessor: 'HanhDong',
-        width: "10%"
+        width: "65%"
     },
 ];
 export const HIDE_COLUMNS = ["Tep", "Ma", "TaoBoi", "NgayTao"]
