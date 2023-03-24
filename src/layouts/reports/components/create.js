@@ -52,13 +52,16 @@ function CreateDocument() {
       };
     });
 
+    docData.sort((a, b) => a.DonVi.localeCompare(b.DonVi));
+
+
     for (let unitIndex = 0; unitIndex < docData.length; unitIndex++) {
       docData[unitIndex] = {
         ...docData[unitIndex],
         Department: await (
           await filterRow(summaryReportExcelFile,["AB"],[docData[unitIndex].DonVi],"AD")
         ).map((element) => {
-          return { Name: element, KHCN: 0, KHDN: 0 };
+          return { Name: element, LuyKeKHCN: 0, LuyKeKHDN: 0, BHKhoanVay: 0 };
         }),
       };
     }
@@ -72,7 +75,7 @@ function CreateDocument() {
         departmentIndex < docData[unitIndex].Department.length;
         departmentIndex++
       ) {
-        docData[unitIndex].Department[departmentIndex]["KHCN"] =
+        docData[unitIndex].Department[departmentIndex]["LuyKeKHCN"] =
           await filterAndSum(
             summaryReportExcelFile,
             ["AB", "AD", "E"],
@@ -83,7 +86,7 @@ function CreateDocument() {
             ],
             "U"
           );
-        docData[unitIndex].Department[departmentIndex]["KHDN"] =
+        docData[unitIndex].Department[departmentIndex]["LuyKeKHDN"] =
           await filterAndSum(
             summaryReportExcelFile,
             ["AB", "AD", "E"],
@@ -91,6 +94,18 @@ function CreateDocument() {
               docData[unitIndex].DonVi,
               docData[unitIndex].Department[departmentIndex].Name,
               "Doanh nghiệp",
+            ],
+            "U"
+          );
+
+          docData[unitIndex].Department[departmentIndex]["BHKhoanVay"] =
+          await filterAndSum(
+            summaryReportExcelFile,
+            ["AB", "AD", "H"],
+            [
+              docData[unitIndex].DonVi,
+              docData[unitIndex].Department[departmentIndex].Name,
+              "Bảo hiểm người vay vốn"
             ],
             "U"
           );
@@ -105,8 +120,9 @@ function CreateDocument() {
       const filteredData = docData.filter(data => data.DonVi === donVi);
       const departmentInfo = filteredData.map(data => data.Department.map(department => [
         department.Name,
-        department.KHCN,
-        department.KHDN
+        department.LuyKeKHCN,
+        department.LuyKeKHDN,
+        department.BHKhoanVay
       ]));
       console.log("Department follow by Don Vi")
       console.log(departmentInfo)
@@ -114,13 +130,13 @@ function CreateDocument() {
     }
     for(let index = 0; index<docData.length; index++){
       let data = getDepartmentInfoByDonVi(docData[index].DonVi).flat();
-      data.unshift(["Phòng","KHCN","KHDN"]);
-      data.unshift(["Đơn vị",docData[index].DonVi,""]);
+      data.unshift(["ĐƠN VỊ " + docData[index].DonVi], [], ["DOANH THU LUỸ KẾ & BH KHOẢN VAY"], [], ["Phòng","Lũy kế KHCN","Lũy kế KHDN","BH khoản vay"]);
       let url = await addDataToExcelFile(data,
-        "accumulated",
+        "docData",
         3,
         `${docData[index].DonVi}.xlsx`
       );
+      
       docData[index] = {...docData[index],TepBaoCao: (
         <div>
           <a
@@ -142,8 +158,10 @@ function CreateDocument() {
     );
   }
   useEffect(() => {
-    //fetchData();
-  }, []);
+    if (listUnit.length > 0){
+      fetchData();
+    }
+  }, [listUnit]);
   const columns = useMemo(() => COLUMNS, []);
 
   const handleSubmit = async (e) => {
@@ -157,10 +175,10 @@ function CreateDocument() {
         true
       )
     );
-
+    
     let result = "thành công";
     if (result.includes("thành công")) {
-      await fetchData();
+      
       toast.success(result, {
         autoClose: 3000,
         closeOnClick: true,

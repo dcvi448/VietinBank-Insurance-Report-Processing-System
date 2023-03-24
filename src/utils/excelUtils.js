@@ -32,8 +32,6 @@ const getWorksheet = async (
   return sheetExcel;
 };
 
-
-
 export const getNonDuplicateValues = async (
   excelUrl,
   columnId = "STT",
@@ -58,7 +56,8 @@ export const filterAndSum = async (
   valuesColumnsMustFilter,
   sumColumn,
   sheetIndex = 0,
-  clearSheetExcelGlobal = false, rndRoundToMillion= true
+  clearSheetExcelGlobal = false,
+  rndRoundToMillion = true
 ) => {
   const worksheet =
     sheetExcel === null
@@ -82,7 +81,7 @@ export const filterAndSum = async (
     0
   );
 
-  return rndRoundToMillion?roundToMillion(sum):sum;
+  return rndRoundToMillion ? roundToMillion(sum) : sum;
 };
 
 export const insertSumToCell = async (
@@ -215,8 +214,8 @@ export const addDataToExcelFile = async (
 ) => {
   try {
     const newWorkbook = XLSX.utils.book_new();
-    const newWorksheet = XLSX.utils.json_to_sheet([]);
-    
+    const newWorksheet = XLSX.utils.aoa_to_sheet([]);
+
     let rowIndex = startRow;
     while (newWorksheet["A" + rowIndex]) {
       rowIndex++;
@@ -227,18 +226,21 @@ export const addDataToExcelFile = async (
       { origin: -1, dateNF: "dd/mm/yyyy" },
       rowIndex
     );
-    
+      newWorksheet["!cols"] = [  { width: 45 },  { width: 15 },  { width: 15 },  { width: 15 },  { width: 15 },  { width: 15 }];;
     XLSX.utils.book_append_sheet(newWorkbook, newWorksheet, sheetName);
-    const workbookArray = XLSX.write(newWorkbook, { type: "array", bookType: "xlsx" });
-    const blob = new Blob([workbookArray], { type: "application/octet-stream" });
+    const workbookArray = XLSX.write(newWorkbook, {
+      type: "array",
+      bookType: "xlsx",
+    });
+    const blob = new Blob([workbookArray], {
+      type: "application/octet-stream",
+    });
     return URL.createObjectURL(blob);
-  
   } catch (error) {
     console.error(error);
     return "";
   }
 };
-
 
 export const insertArrayToSheetJS = async (
   arr,
