@@ -61,7 +61,7 @@ function CreateDocument() {
         Department: await (
           await filterRow(summaryReportExcelFile,["AB"],[docData[unitIndex].DonVi],"AD")
         ).map((element) => {
-          return { Name: element, LuyKeKHCN: 0, LuyKeKHDN: 0, BHKhoanVay: 0 };
+          return { Name: element, LuyKeKHCN: 0, LuyKeKHDN: 0, BHKhoanVay: 0, BHKhoanVayCaNhan:0, BHKhoanVayDoanhNghiep:0 };
         }),
       };
     }
@@ -98,6 +98,32 @@ function CreateDocument() {
             "U"
           );
 
+          docData[unitIndex].Department[departmentIndex]["BHKhoanVayCaNhan"] =
+          await filterAndSum(
+            summaryReportExcelFile,
+            ["AB", "AD", "E", "H"],
+            [
+              docData[unitIndex].DonVi,
+              docData[unitIndex].Department[departmentIndex].Name,
+              "Cá nhân",
+              "Bảo hiểm người vay vốn"
+            ],
+            "U"
+          );
+
+          docData[unitIndex].Department[departmentIndex]["BHKhoanVayDoanhNghiep"] =
+          await filterAndSum(
+            summaryReportExcelFile,
+            ["AB", "AD", "E", "H"],
+            [
+              docData[unitIndex].DonVi,
+              docData[unitIndex].Department[departmentIndex].Name,
+              "Doanh nghiệp",
+              "Bảo hiểm người vay vốn"
+            ],
+            "U"
+          );
+
           docData[unitIndex].Department[departmentIndex]["BHKhoanVay"] =
           await filterAndSum(
             summaryReportExcelFile,
@@ -122,6 +148,8 @@ function CreateDocument() {
         department.Name,
         department.LuyKeKHCN,
         department.LuyKeKHDN,
+        department.BHKhoanVayCaNhan,
+        department.BHKhoanVayDoanhNghiep,
         department.BHKhoanVay
       ]));
       console.log("Department follow by Don Vi")
@@ -130,7 +158,7 @@ function CreateDocument() {
     }
     for(let index = 0; index<docData.length; index++){
       let data = getDepartmentInfoByDonVi(docData[index].DonVi).flat();
-      data.unshift(["ĐƠN VỊ " + docData[index].DonVi], [], ["DOANH THU LUỸ KẾ & BH KHOẢN VAY"], [], ["Phòng","Lũy kế KHCN","Lũy kế KHDN","BH khoản vay"]);
+      data.unshift(["ĐƠN VỊ " + docData[index].DonVi], [], ["DOANH THU LUỸ KẾ & BH KHOẢN VAY"], [], ["Phòng","Lũy kế KHCN","Lũy kế KHDN","BH khoản vay cá nhân", "BH khoản vay Doanh nghiệp", "BH khoản vay (Tổng)"]);
       let url = await addDataToExcelFile(data,
         "docData",
         3,
